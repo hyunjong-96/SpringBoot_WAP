@@ -491,7 +491,61 @@ public @interface Auth{
    * WebApplicationInitializer Interface의 구현체
    * Tomcat같은 Servlet Container환경에서 SpringBootApplication이 동작 될 수 있도록 하는 Web Application Copntext를 구성한다는 의미
 
-   *Tomcat
+5. 
 
-   ![image](https://user-images.githubusercontent.com/57162257/107148672-db96bf80-6997-11eb-9232-b8fd10b52084.png)
-   톰캣은 webserver(정적 data처리)에서 넘어온 동적인 페이지를 읽고 프로그래밍을 실행하고 결과를 html로 재구성해서 webServer(apach)로 돌려준다
+
+
+
+
+# *서치
+
+## WebServer
+
+* 웹 서버는 웹 브라우저 클라이언트로부터 HTTP요청을 받아 정적인 컨첸츠(.html .jpeg .css등)를 제공하는 컴퓨터 프프로그램
+* WAP을 사용하지않고 WebServer만 사용하면 WAP을 사용하는것보다 더 빠르고 효율적으로 정적인 데이터를 받을수 있다.
+
+## WAS(Tomcat)
+
+![image](https://user-images.githubusercontent.com/57162257/107148672-db96bf80-6997-11eb-9232-b8fd10b52084.png)
+
+* WAS(Web Application Service) = Web Server + Web Container
+* WAS는 DB조회나 다양한 로직 처리를 요구하는 동적인 컨텐츠를 제공하기 위해 만들어진 Appliocation Server
+* 톰캣은 webserver(정적 data처리)에서 넘어온 동적인 페이지를 읽고 프로그래밍을 실행하고 결과를 html로 재구성해서 webServer(apach)로 돌려준다
+
+
+
+# 영속성(Persistence)
+
+* 데이터를 생성한 프로그램이 종료되더라도 사라지지 않는 데이터의 특성을 말함.
+* 영속성을 갖지 않는 데이터는 단지 메모리에서만 존재하기 떄문에 프로그램이 종료되면 모두 잃어버리게 된다. 때문에 파일 시스템,관계형 데이터베이스, 혹은 객체 데이터베이스 등을 활용하여 데이터를 영구적으로 저장하여 영속성을 부여함.
+
+# SQL Mapper
+
+* SQL Mapper는 SQL문장으로 직접 데이터베이스를 다룬다.
+* MyBatis, jdbcTemplates 등..
+
+# ORM
+
+* 데이터베이스 객체를 자바 객체로 매핑함으로써 객체 간의 관계를 바탕으로 SQL을 자동으로 생성.
+* Persistence(영속성) API라고도 할수있음.
+* JPA, Hibernate등
+
+# JDBC(Java Database Connectivity)
+
+* JDBC는 DB에 접근할 수 있도록 Java에서 제공하는 API이다. ㅁ보든 Java Data Access기술의 근간으로 모든 Persistence Framework는 내부적으로 JDBC API를 사용한다.
+  ![image](https://user-images.githubusercontent.com/57162257/107179473-e5f99d80-6a19-11eb-8634-0c48f386e8d9.png)
+
+# JPA(Java Persistent API)
+
+![image-20210208142915108](C:\Users\leehyunjong\AppData\Roaming\Typora\typora-user-images\image-20210208142915108.png)
+
+* 자바 ORM기술에 대한 API표준 명세로 Java에서 제공하는 API
+* 사용자가 원하는 JPA구현체(Hibernate 등)를 선택해서 사용할수 있다.
+
+# Mybatis
+
+![image-20210208143047774](C:\Users\leehyunjong\AppData\Roaming\Typora\typora-user-images\image-20210208143047774.png)
+
+* 개발자가 지정한 SQL, 저장 프로시저 그리고 몇 가지 고급 매핑을 지원하는 SQL Mapper.
+* mybastis의 장점은 SQL에 대한 모든 컨트롤을 하고자 할 때 매우 적합하다, SQL쿼리들의 최적화가 잘되어 있을떄 유용하다.
+* 단점은 애플리케이션과 데이터베이스 간의 설계에 대한 모든 조작을 하고자 할 때는 적합하지 않다. 왜냐면 애플리케이션과 데이터베이스의 구조화가 잘 되도록 많은 설정부분을 바꾸어야 하기 때문이다.
