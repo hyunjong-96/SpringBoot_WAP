@@ -100,6 +100,23 @@ public User(final int idx,final String name,final String part){
 4. 생성자가 종료되면 new연산자는 객체의 **참조 값을 반환**한다.
 5. user변수에 User객체의 **참조 값 할당**
 
+## [4]static
+
+* static으로 설정하면 같은 곳의 메모리 주소(동일한 참조 값)만을 가리키기 떄문에 static변수의 값을 공유하게 된다.
+* 클래스 변수 라고도 부른다.
+* 인스턴스화 하지 않고도 사용이 가능하다.(메모리를 공유하기 떄문)
+* 해당 값을 변경하지 못하게 하기 위해서는 final키워드를 함께 사용해준다.
+
+## [5]final
+
+* 해당 Entity가 오직 한 번 할당 될 수 있음을 의미.
+* 상속/변경을 금지하는 규제.
+* final변수 : 해당 변수가 생성자나 대입 연산자를 통해 **한 번만 초기화 가능함**
+* final메소드 : 해당 메소드를 @Override하거나 숨길 수 없음을 의미한다.
+* final클래스 : 해당 클래스를 상속할 수 없음을 의미. 상속 계층 구조에서 마지막 클래스를 의미한다.
+* 상수를 표현할 떄 static과 같이 사용한다.
+* final키워드가 붙으면 해당 객체는 immutable이된다.
+
 ## *은닉화
 
 클래스의 Field는 Private로 접근 재어지시자로 지정한 뒤 Getter,Setter를 통해 Filed의 값을 변경, 호출한다.
@@ -491,11 +508,139 @@ public @interface Auth{
    * WebApplicationInitializer Interface의 구현체
    * Tomcat같은 Servlet Container환경에서 SpringBootApplication이 동작 될 수 있도록 하는 Web Application Copntext를 구성한다는 의미
 
-5. 
+
+## [2]MVC
+
+![image](https://user-images.githubusercontent.com/57162257/107182641-789d3b00-6a20-11eb-8bc7-5f4f7221833b.png)
+
+* Model-View-Controller
+* 사용자 인터페이스로부터 비즈니스 로직을 분리
+* 애플리케이션을 세가지의 역할로 구분한 패턴
+* Model : 정보(data), 데이터베이스
+* View : 사용자 인터페이스, 프론트 엔드
+* Controller : 데이터와 비즈니스 로직 사이의 상호작용 관리
+  사용자가 접근한 URL에 따라 요청에 맞는 데이터를 Model로 처리를 위임하고, 데이터를 View에 반영해 사용자에게 알려준다.
 
 
 
+![image](https://user-images.githubusercontent.com/57162257/107183353-09284b00-6a22-11eb-8080-e4259a1e9129.png)
 
+1. 클라이언트의 요청에 대한 최초 진입 지점은 DispatcherServlet이 담당. 이 Servlet이 최초 진입 지점으로 다음의 작업을 처리하게 된다.
+2. DispatcherServlet은 Spring Bean Definition에 설정되어 있는 Handler Mapping 정보를 참조하여 해당 요청을 처리하기 위한 Controller를 찾는다.
+3. DispatcherServlet은 선택된 Controller를 호출하여 클아이언트가 요청한 작업을 처리한다.
+4. Controller는 Business Layer와의 통신을 통하여 원하는 작업을 처리한 다음 요청에 대한 성공유무에 따라 ModelAndView인스턴스를 반환한다. ModelAndView클래스에는 UI Layer에서 사용할 Model데이터와 UI Layer로 사용할 View에 대한 정보가 포함되어 있다.
+5. DispatcherServlet은 ModelAndView의 View의 이름이 논리적인 View정보이면 ViewResolver를 참조하여 이 논리적인 View정보를 실질적으로 처리해야할 View를 생성하기 된다.
+6. DispatcherServlet은 ViewResolver를 통하여 전달된 View에게 ModelAndView를 전달하여 마지막으로 클라이언트에게 원하는 UI를 제공할 수 있도록 한다. 마지막으로 클라이언트에게 UI를 제공할 책임은 View클래스가 담당하게 된다.
+
+## [3]Servlet
+
+* Java를 사용하여 웹 페이지를 동적으로 생성하는 서버측 프로그램을 말한다.
+* 웹 서버의 성능을 향상하기 위해 사용되는 자바 클래스의 일종.
+* JSP와 비슷한 점이 있지만. JSP는 HTML에 Java코드를 포함하고있지만, Servlet은 Java코드에 HTML을 포함하고있음.
+* 외부 요청마다 Thread로 응답한다.
+* Java로 구현되기 떄문에 다양한 플랫폼에서 동작한다.
+
+## [4]Web Container(Servlet Container)
+
+* 웹 서버의 컴포넌트 중 하나로 Java Servlet과 상호작용 한다.
+* 웹 컨테이너는 Servlet의 생명주기를 관리하고, URL과 특정 Servlet을 Mapping하여 URL요청이 올바른 접근 권한을 갖도록 한다.
+* Servlet, JSP, Server Side Code가 포함된 다른 타입의 파일들에 대한 요청을 다룬다.
+* Servlet객체를 생성하고, Servlet을 로드, 언로드하며 요청과 응답 객체를 생성, 관리하고 다른 Servlet관리 작업을 수행한다.
+
+## [5]WAS
+
+![image](https://user-images.githubusercontent.com/57162257/107184372-c8313600-6a23-11eb-9d5d-e697e42117d3.png)
+
+1. Web Server로 부터 요청이 들어오면 Container가 이를 안맞게 처리한다.
+2. Container는 web.xml(배포 서술자)를 참조하여 해당 서블릿에 대한 스레드를 생성하고 httpservletRequest 및 httpServletResponse객체를 생성하여 전달한다.
+3. 다음으로 컨테이너는 서블릿을 호출(service())
+4. 호출된 서블릿의 작업을 담당하게 된 스레드(미리 생성된 스레드)는 요청에 따라 doPost(), 또는 doGet()을 호출한다.
+5. 호출된 doPost9),doGet()메소드는 생성된 동적 페이지를  Response객체에 실어서 컨테이너에 전달한다.
+6. 컨테이너는 전달받은 Response객체를 HttpResponse형태로 전환하여 웹 서버에 전달하고 생성되었던 스레드를 종료하고, HttpservletRequest 및 httpservletResponse객체를 소멸시킨다.
+
+# 8.Spring Presentation Layer
+
+## [1]Controller
+
+### @RestController
+
+* REST를 위한 전용 Controller 기능을 부여하는 Annotation
+* @RestController = @Controller + @ResponseBody
+* 반환값을 JSON으로 변환해 준다.
+
+### @Controller
+
+* 템플릿을 이용해서 HTML페이지를 렌더링하고 표시해준다
+
+### @ResponseBody 
+
+* 반환값을 JSON으로 변환해 준다.
+
+### @GetMapping
+
+* Get메소드 전용 Controller Annotation
+* 리소스를 조회하는 요청에 사용
+
+### @RequestMappgin
+
+* method, value를 구분시켜준다.
+* @RequestMapping(method= RequestMethod.GET, value=""); 의 뜻은 httpMethod는 Get이고 URL Mapping은 ""이다.
+
+### @PathVariable
+
+* URL Mapping에 {}문법 추가
+
+* public String getName(@PathVariable(value="name") final String name){ return name }
+
+  만약 URL에 "/name/이현종"으로 들어오면 이현종이 name이라는 Parameter값으로 받아져 name이라는 String타입의 변수로 변환되게된다.
+
+### @RequestParam
+
+* QueryString을 받아올때 사용
+
+* **/part?part=서버** 와 같은 형태
+
+* ```java
+  @GetMapping("/info")
+  public String getPart(
+      @RequestParam(value="name")final String name,
+  	@RequestParam(value="type",defailtValue="yb")final String type
+  ){
+      return name+"이고 "+ type + "입니다."; 
+  }
+  ```
+
+  value는 queryString의 key값
+  defaultValue는 queryString값이 없을 경우의 기본값.
+  ex) URL : **localhost:8080/info?name=이현종&type=ob**  => 이현종이고 ob입니다.
+
+### @PostMapping
+
+* Post메소드 전용 Controller Annotation
+* 리소스를 생성하는 요청에 사용
+
+### @RequestBody
+
+* requestBody를 parameter로 객체를 받는 Annotation
+* http Messsage본문을 자바 객체로 변환해준다(Mapping)
+* Spring MVC내의 HttpMessageConverter가 변환을 처리해준다.
+* 전송한 객체와 전송 받을 Controller의 객체 타입이 같아야 한다.
+* 같지 않으면 값이 자동으로 채워지지 않고 기본값이 들어간다.
+
+#### *Request Body객체 받는 순서
+
+![image](https://user-images.githubusercontent.com/57162257/107192588-27497780-6a31-11eb-825b-bf37bb65abb3.png)
+
+1. Default생성자를 통해 빈 객체가 생성된다.(**빈 생성자 필수!**)
+2. 전송 받은 Http Message Body에 생성된 객체의 속성값이 있다면 Set Method를 통해 값이 채워진다.
+
+### @PutMapping
+
+* Put 메소드 전용 Controller Annotation
+
+### @DeleteMapping
+
+* Delet 메소드 전용 Controller Annotation
 
 # *서치
 
