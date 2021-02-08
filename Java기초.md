@@ -650,6 +650,150 @@ public @interface Auth{
 2. 다른 WAS(Tomcat)이용
    1. War로 Build
 
+
+
+# 10.Spring
+
+## [1]Architecture
+
+![image](https://user-images.githubusercontent.com/57162257/107230018-ddc55080-6a61-11eb-80d9-b74754d0b2ac.png)
+
+## [2]Spring IoC(Inversion of Control, 제어의 역전)
+
+* 프로그램의 제어 흐름 구조가 바뀌는것
+* 사용자가 객체를 생성하고 소멸시키는 것이 컨테이너가 대신 하게 된다.(제어의 역전)
+* 이 제어권이 스프링 Container로 넘어가는 것이 Spring IoC다.
+* 제어권이 Container로 넘어 감으로써 DI, AOP가 가능하다.
+* 인스턴스의 생성부터 소멸까지의 객체(Bean) 생명주기를 Container가 관리하게 된다.
+
+## [3]Spring DI(Dependency Injection, 의존성 주입)
+
+* 인스턴스를 자신이 아닌 IoC Container에서 생성 후 주입한다.
+* 내부적으로 new 키워드를 사용하지 않고 내부적으로 setter나 생성자를 이용한다.
+* 기능이 변경 될 때마다 코드를 변경하는 것은 비용이 많이 들게 되므로 가급적 코드의 변화가 적어지도록 프로그램을 작성하기 위해 탄생
+* 모듈간 결합도를 낮춰서 유연한 변경을 가능하도록 한다.
+* 불 필요한 의존 관계를 없애거나 줄일 수 있다.
+* 각 객체를 bean컨테이너로 관리한다.
+* IoC를 구현하는 한 가지 방법이 DI이다.
+
+## [4]Spring Container
+
+* 컨테이너는 보통 인스턴스의 생명 주기를 관리하며, 생성된 인스턴스들에게 추가적인 기능을 제공하도록 한다.
+* 작성한 코드의 처리과정을 위임 받은 독립적인 존재.
+* 적절한 설정만 되어있다면 누구의 도움 없이도 프로그래머가 작성한 코드를 스스로 참조한 뒤 알아서 객체의 생성과 소멸을 컨트롤해준다.
+* Spring Container는 IoC를 사용해 어플리케이션을 구성하는 빈/컴포넌트 들을 관리한다.
+* Spring Container = IoC Container = DI Container
+* Spring Container의 종류
+  1. BeanFactory
+     * DI의 기본사항을 제공하는 가장 단순한 컨테이너
+     * 팩토리 패턴을 구현한 것
+     * Bean을 생성하고 분배하는 책임을 지는 클래스
+     * Bean의 정의는 즉시 로딩, 하지만 Bean 인스턴스 생성은 Lazy Loading한다.
+     * 처음으로 getBean()이 호출된 시점에서야 해당 빈을 생성(Lazy Loading)
+  2. ApplicationContext
+     * BeanFactory인터페이스를 상속 받은 하위 인터페이스
+     * BeanFactory와 유사한 기능을 제공하지만 좀 더 많은 기능을 제공한다.
+     * 국제화가 지원되는 텍스트 메시지를 관리해준다.
+     * 이미지같은 파일 자원을 로드 할 수 있는 포괄적인 방법을 제공한다.
+     * Listener로 등록된 Bean에게 이벤트 발생을 알려준다.
+     * Context초기화 시점에서 모든 싱글톤 Bean을 미리 로드한 후 어플리케이션 기동
+* Spring Container 생명주기
+  1. 생성
+  2. 설정
+  3. 사용
+  4. 종료
+
+## [5]Spring Bean
+
+* 자바 객체
+* 스프링 컨테이너에 의해서 만들어지고 관리되면 Spring Bean
+* 다양한 Annotation으로 스프링 컨테이너에 Bean을 등록한다.
+* 사용자가 직접 컨트롤 하지 않고 컨테이너가 Bean을 주입해준다.
+
+## [6]POJO
+
+* 우리가 매일 사용하는 자바 객체(getter, setter가 있는 그것)
+* 스프링을 모두 제거해도 POGO는 작동을 해야 하는 것이 스프링의 철학
+
+## [7]Spring Life Cycle
+
+![image](https://user-images.githubusercontent.com/57162257/107232651-fe42da00-6a64-11eb-9aaa-ea97a1ad9710.png)
+
+
+
+# 11.Lombok
+
+* IDEA와 Build도구에 자동으로 연결되는 Java라이브러리
+* Model을 만들고 각 멤버 변수와 관련된 Method를 자동으로 만들어준다
+* 다양한 Annotation을 사용해 코드가 간결해 진다.
+* AnnotationProcessor를 이용해 Compile시점에 코드를 생성해준다.
+* 라이브러리를 도입하기 전엔 항상 모든 팀원 간의 합의가 있어야한다.
+
+## [1]@Data
+
+* 모든 멤버 변수의 생성자 및 접근자, toString,equals, hashCode등 모든 메소드 자동 생성.
+
+* 만능 Annotation이지만 사용하지 않는 메소드까지 만들어 주므로 사용시 고민할 필요가 있음.
+
+* Builder클래스까지는 자동으로 만들어주지않음.
+
+  ```java
+  @Data
+  public class TestData{
+      private int userIdx;
+      private String name;
+      private String email;
+  }
+  ```
+
+  ![image](https://user-images.githubusercontent.com/57162257/107236102-b756e380-6a68-11eb-8a2b-d920cf75ee0a.png)
+
+  
+
+## [2]@Getter & @Setter
+
+* @Setter : 필드에 대해 자동으로 Setter메소드를 만들어 준다.
+* @Getter : 필드에 대해 자동으로 Getter메소드를 만들어 준다.
+
+## [3]@NoArgsConstructor
+
+* Default 생성자 자동 생성
+* 같은 기능의 생성자가 이미 존재할 경우 Compile Error
+
+## [4]@AllArgsConstructor
+
+* 모든 필드에 대한 생성자 자동 생성
+
+## [5]@NonNull
+
+* 클래스가 아닌 필드에 붙이는 Annotation
+* RunTime시에 Null체크를 통해 NullPointerException발생(실행시켰을떄)
+* Compile시에는 Null체크하지 않는다.
+
+## [6]@RequireArgsConstructor
+
+* @NonNull 이나 final 키워드가 붙여진 필드의 생성자 자동 생성
+
+## [7]@Builder
+
+* 자동으로 Builder클래스 및 메소드 생성
+  ![image](https://user-images.githubusercontent.com/57162257/107238356-17e72000-6a6b-11eb-8f06-d1846348fe1e.png)
+
+  ![image](https://user-images.githubusercontent.com/57162257/107238669-76ac9980-6a6b-11eb-9beb-3a867f7f3811.png)
+
+  
+
+## [8]@Value
+
+* Immutable Class로 만드는 Annotation
+* 모든 필드 값 private final
+* Getter메소드는 생성하지만 Setter메소드는 생성하지 않는다.
+* 해당 클래스는 더 이상 상속이 불가능.
+
+
+
+
+
 # *서치
 
 ## Array &  List
@@ -697,7 +841,12 @@ public @interface Auth{
 
 ![image](https://user-images.githubusercontent.com/57162257/107219277-3130a200-6a54-11eb-8760-db93041755f2.png)
 
+### 메소드
 
+* add : element
+* get : index
+* set : index,element
+* remove : index
 
 
 
