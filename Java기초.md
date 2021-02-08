@@ -642,14 +642,71 @@ public @interface Auth{
 
 * Delet 메소드 전용 Controller Annotation
 
+# 9.SpringBoot App 3가지 배포 방법
+
+1. 내장 Tomcat이용
+   1. Jar로 Build
+   2. Maven명령어 이용
+2. 다른 WAS(Tomcat)이용
+   1. War로 Build
+
 # *서치
+
+## Array &  List
+
+[https://velog.io/@adam2/Array%EC%99%80-List%EA%B7%B8%EB%A6%AC%EA%B3%A0-Java-List]
+
+### Array
+
+* index로 해당 원소에 접근가능
+* 연속된 메모리의 공간으로 이루어짐
+* **장점 :** 인덱스를 통한 검색이 용이함, 연속적이므로 메모리 관리가 편하다.
+* **단점 :** 크기가 고정되어있기때문에 삭제되면 상태를 빈 공간으로 남겨야함(메모리 낭비), 정적이므로 배열의 크기를 컴파일 이전에 정해주어야함.
+* **데이터의 크기가 정해져있고, 추가적인 삽입 삭제가 일어나지 않으며 검색을 필요로 할때 유리**
+
+### List
+
+* 순서가 있는 엘리먼트의 모임으로 배열과는 다르게 빈 엘리먼트는 절대 허용하지않는다.
+* 리스트의 index는 몇 번째 데이터인가 정도(순서)의 의미를 가짐
+* 포인터를 통한 접근
+* **장점 :** 포인터를 통해 다음 데이터의 위치를 가르키고 있어 삽입 삭제의 용이, 동적이므로 크기가 정해져있지 않음, 메모리의 재사용 편리
+* **단점 :** 검색기능이 좋지않음, 포인터를 통해 다음 데이터를 가르키므로 추가적인 메모리 공간 발생
+* **데이터의 크기가 정해져있지 않고, 삽입 삭제가 많이 일어나며, 검색이 적은 경우**
+
+### ArrayList
+
+* Array와 ArrayList는 인덱스로 객체를 관리한다는 점에서 동일하지만, 크기를 동적으로 늘릴수 있다.
+* 설정한 저장 용량을 넘어서 더 많은 객체가 들어오면, 배열 크기를 1.5배로 증가시킴.
+* 중간위치의 객체에 변화가있을때 뒤에 있는 객체들의 위치가 한꺼번에 움직이게됨.
+* Array는 primitive type(int, byte, char 등)과 object를 담을수 있지만, ArrayList는 object element만 담을 수 있다.
+* 길이에 대해 size() 메소드 사용.
+* **장점 :** 데이터를 검색할떄 매우 빠름
+* **단점 :** 저장 용량을 늘리는데 많은 시간이 소요, 저장된 데이터를 삭제하는 데도 많은 시간이 소요 
+* **잦은 원소의 이동, 삭제가 발생할 경우 ArrayList보다 LinkedList를 사용하는 것이 좋음.**
+  ![image](https://user-images.githubusercontent.com/57162257/107219035-d8f9a000-6a53-11eb-97b7-2fc7d6107568.png)
+
+### LinkedList
+
+* 노드 간에 연결을 통해서 리스트로 구현된 객체.
+* 다음 노드의 위치 정보만 가지고 있으며 인덱스를 가지고 있지 않기 때문에 탐색시, 순차접근만 가능(노드 탐색 시 시간이 많이 소요됨)
+* 추가/삭제는 위치정보의 수정만으로 가능하기 떄문에 성능이 좋음.
+* **장점 :** 저장 용량을 늘리는 과정이 간단, 저장된 데이터를 삭제하는 과정도 매우 간단.
+* **단점 :** 데이터를 검색할 때 매우 느림 
+
+![image](https://user-images.githubusercontent.com/57162257/107219202-18c08780-6a54-11eb-8966-77df1c7b0e6f.png)
+
+![image](https://user-images.githubusercontent.com/57162257/107219277-3130a200-6a54-11eb-8760-db93041755f2.png)
+
+
+
+
 
 ## WebServer
 
 * 웹 서버는 웹 브라우저 클라이언트로부터 HTTP요청을 받아 정적인 컨첸츠(.html .jpeg .css등)를 제공하는 컴퓨터 프프로그램
 * WAP을 사용하지않고 WebServer만 사용하면 WAP을 사용하는것보다 더 빠르고 효율적으로 정적인 데이터를 받을수 있다.
 
-## WAS(Tomcat)
+## WAS
 
 ![image](https://user-images.githubusercontent.com/57162257/107148672-db96bf80-6997-11eb-9232-b8fd10b52084.png)
 
@@ -657,37 +714,44 @@ public @interface Auth{
 * WAS는 DB조회나 다양한 로직 처리를 요구하는 동적인 컨텐츠를 제공하기 위해 만들어진 Appliocation Server
 * 톰캣은 webserver(정적 data처리)에서 넘어온 동적인 페이지를 읽고 프로그래밍을 실행하고 결과를 html로 재구성해서 webServer(apach)로 돌려준다
 
+## TomCat
+
+* Apache소프트웨어 재단에서 개발한 Servlet Container(Web Container)만 있는 Web Application Server이다. = WAS
+* Web Server와 연동하여 실행할 수 있는 자바 환경을 제공한다.
+* Servlet이나 JSP를 실행하기 위한 Servlet Container을 제공한다.
+* 정적 컨텐츠를 로딩 하는데 웹 서버보다 수행 속도가 느리다.
 
 
-# 영속성(Persistence)
+
+## 영속성(Persistence)
 
 * 데이터를 생성한 프로그램이 종료되더라도 사라지지 않는 데이터의 특성을 말함.
 * 영속성을 갖지 않는 데이터는 단지 메모리에서만 존재하기 떄문에 프로그램이 종료되면 모두 잃어버리게 된다. 때문에 파일 시스템,관계형 데이터베이스, 혹은 객체 데이터베이스 등을 활용하여 데이터를 영구적으로 저장하여 영속성을 부여함.
 
-# SQL Mapper
+## SQL Mapper
 
 * SQL Mapper는 SQL문장으로 직접 데이터베이스를 다룬다.
 * MyBatis, jdbcTemplates 등..
 
-# ORM
+## ORM
 
 * 데이터베이스 객체를 자바 객체로 매핑함으로써 객체 간의 관계를 바탕으로 SQL을 자동으로 생성.
 * Persistence(영속성) API라고도 할수있음.
 * JPA, Hibernate등
 
-# JDBC(Java Database Connectivity)
+## JDBC(Java Database Connectivity)
 
 * JDBC는 DB에 접근할 수 있도록 Java에서 제공하는 API이다. ㅁ보든 Java Data Access기술의 근간으로 모든 Persistence Framework는 내부적으로 JDBC API를 사용한다.
   ![image](https://user-images.githubusercontent.com/57162257/107179473-e5f99d80-6a19-11eb-8634-0c48f386e8d9.png)
 
-# JPA(Java Persistent API)
+## JPA(Java Persistent API)
 
 ![image-20210208142915108](C:\Users\leehyunjong\AppData\Roaming\Typora\typora-user-images\image-20210208142915108.png)
 
 * 자바 ORM기술에 대한 API표준 명세로 Java에서 제공하는 API
 * 사용자가 원하는 JPA구현체(Hibernate 등)를 선택해서 사용할수 있다.
 
-# Mybatis
+## Mybatis
 
 ![image-20210208143047774](C:\Users\leehyunjong\AppData\Roaming\Typora\typora-user-images\image-20210208143047774.png)
 
