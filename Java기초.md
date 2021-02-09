@@ -786,13 +786,110 @@ public @interface Auth{
 ## [8]@Value
 
 * Immutable Class로 만드는 Annotation
+
 * 모든 필드 값 private final
+
 * Getter메소드는 생성하지만 Setter메소드는 생성하지 않는다.
+
 * 해당 클래스는 더 이상 상속이 불가능.
 
+* AllArgsConstructor자동 생성
+
+* **@NonFinal** : 해당 필드의 final을 선언하지 않을떄 사용
+
+* **@With(AccessLevel.PROTECTED)** : 해당 필드의 값을 변경한 새로운 객체를 만들어준다.
+
+  ![image](https://user-images.githubusercontent.com/57162257/107240016-cc357600-6a6c-11eb-97fc-a4e8d2fc5650.png)
+
+  ![image](https://user-images.githubusercontent.com/57162257/107240051-d5bede00-6a6c-11eb-81de-df7ab17aefd2.png)
 
 
 
+## [9]@Slf4j
+
+* 콘솔창에 로그 출력
+* 로그 출력으로 System.out.println을 사용하지 말자.
+
+![image](https://user-images.githubusercontent.com/57162257/107240349-27ffff00-6a6d-11eb-95e6-b856bcebbf2f.png)
+
+
+
+# 12.Business Logic Layer
+
+* 비즈니스 로직(핵심 기능)을 구현하는 웹 애플리케이션의 중심
+* 웹 애플리케이션의 성공은 비즈니스 로직
+* 보통 트랜잭션의 단위가 된다.
+* 부품화
+* 유지 보수의 핵심
+* Interface를 상요해 제약을 걸고, 유지 보수의 무게를 좀 더 둔다.
+* 중복되는 기능은 가능한 별도의 Interface로 분리 하는 것을 항상 고민한다.
+
+## ACID
+
+* 트랜잭션의 속성
+* Atomicity : 원자성, 트랜잭션 내의 모든 처리는 전부 성공하거나, 전부 실패해야한다.
+* Consistency : 일관성, 데이터에 일관성이 있어야한다.
+* Isolation : 고립성, 서로 다른 트랜잭션끼리 영향을 줄수 없다.
+* Durability : 영속성/지속성, 트랜잭션의 결과는 지속되야한다.
+
+## [1]ResponseEntity
+
+* HTTP StatusCode를 함께 전송해주기 위해 사용한다.
+* ResponseEntity는 StatusCode, Headers, Body를 설정할수있다.
+* 내부적으로 HttpEntity를 상속한다.
+
+![image](https://user-images.githubusercontent.com/57162257/107331879-ca17f980-6af6-11eb-88eb-94a68c3aabb4.png)
+
+## [2]@Service
+
+* Business Logic중 애플리케이션에서 사용할 수 있게 컴포넌트(부품화)한 부분을 Service Layer
+* Bean으로 등록해 언제,어디서든 사용할 수 있는 Class(재사용)
+* Spring IoC컨테이너에 서비스Bean으로 등록
+
+![image](https://user-images.githubusercontent.com/57162257/107331814-b5d3fc80-6af6-11eb-876d-46e10a49ea1c.png)
+
+UserService인터페이스
+![image](https://user-images.githubusercontent.com/57162257/107333689-28de7280-6af9-11eb-88ea-12582f332fa4.png)
+
+UserServiceImpl클래스
+![image](https://user-images.githubusercontent.com/57162257/107333772-44497d80-6af9-11eb-85f2-f7feda2e3913.png)
+
+Interface구현체의 장단점.
+
+* Interface 및 구현체 사용할 경우
+  * 장점 : 유지보수가 쉬워짐, 좀 더 안전하다(강제성)
+  * 단점 : 불 필요한 작업이 많아진다, 설계가 어렵다.
+* 사용하지않는 경우
+  * 장점 : 불필요한 작업이 줄어든다, Interface에 제약을 받지 않기 떄문에 자유롭게 수정이 가능하다, 개발 속도가 빠르다.
+  * 단점 : 같은 기능 다른 구현을 할 경우 비 효율적이다.
+
+# 13.AWS
+
+1. ec2 인스턴스 생성
+2. 생성된 ec2인스턴스에 java 설치
+   sudo apt install default-jre
+   sudo apt install openjdk-11-jre-headless
+   sudo apt install openjdk-8-jre-headless
+   sudo update-alternatives --config java(8버전이 많이 사용됨으로 해당 명령어로 8버전으로 바꿔준다.)
+   java -version
+3. maven설치
+   sudo apt list maven
+   sudo apt-get install maven
+   mvn -v
+4. Timezon변경
+   sudo dpkg-reconfigure tzdata
+   Asia -> Seoul
+5. 배포[intellij]
+   1. 오른쪽 화면의 maven뷰를 열고 LifeCycle-package더블클릭
+   2. 터미널에서 mvnw package입력
+   3. Build로그에서 Building jar파일명과 위치 확인.
+   4. 빌드된 .jar파일위치로 가서 확인
+   5. mobaxterm을 통해 ec2서버로 이동한후 .jar파일을 ec2서버에 옮겨준다.(인바운드에 현재 서버 포트를 열여줘야한다.)
+   6. java -jar [파일이름].jar 실행시켜주면 서버 배포완료
+   7. 무중단 배포를 위해 **nohup java -jar [파일이름].jar**
+      ![image](https://user-images.githubusercontent.com/57162257/107357261-30ac1000-6b15-11eb-8bb6-b53e26c04d62.png)
+   8. netstat -tnlp로 현재 프로세스 확인
+   9. kill PID 로 죽이고 싶은 프로세스 죽이면 끝.
 
 # *서치
 
