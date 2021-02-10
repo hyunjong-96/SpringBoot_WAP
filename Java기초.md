@@ -932,9 +932,118 @@ Interface구현체의 장단점.
   * 참조 무결성(Referential Integrity) : 외래 키(외부 키)의 개념과 관련된다.
     외래 키 값이 특정 테이블의 기본 키 값을 참조하는 것이다.또는 빈 값을 허용한다.
     ex)참조 무결성이 깨지는 경우 : A 테이블을 참조하는 B테이블이 있다. 근데 A테이블에 B테이블의 특정 튜플이 참조하는 튜플이 A테이블에 존재하지 않는다면 참조 무결성이 꺠지는 경우이다.
+    * 참조 무결성을 지키기위해 RESTRICTED, CASCADE, SET NULL이라는 개념을 외래 키에 적용할수 있다.
+      * **RESTRICTED** : 레코드를 변경 또는 삭제하고자 할 때 해당 레코드를 참조하고 있는 개체가 있다면, 변경 또는 삭제 연산을 취소한다.
+      * **CASCADE** : 레코드를 변경 또는 삭제하면, 해당 레코드를 참조하고 있는 개체도 변경 또는 삭제된다.
+      * **SET NULL** : 레코드를 변경 또는 삭제하면, 해당 레코드를 참조하고 있는 개체의 값을 NULL로 설정한다.
   * 도메인 무결성(Domain Integrity) : 테이블에 존재하는 필드의 무결성을 보장하기 위한 것.
     필드의 타입, NULL값의 허용 등에 대한 사항을 정의, 올바른 데이터가 입력 되었는지를 확인하는것.
     ex)도메인 무결성이 깨지는 경우 : 주민번호 필드에 알파벳이 입력되는 경우.
+
+## [2]정규화
+
+* RDB설계에서 중복을 최소화하게 데이터를 구조화하는 과정.
+* 기본 정규화 : 1NF, 2NF, 3NF. BCNF
+* 고급 정규화 : 4NF, 5NF
+* 새로운 형태의 데이터가 삽입될 때 테이블 설계를 재구성할 필요성을 감소시킨다.
+* 정규화가 잘 되 있다면 기획자가 추가로 요구하는 기능을 추가하는데 무리가 없다.
+* 과도한 정규화는 복잡한 DB모델링이 될 수 있다.
+* 떄로는 정규화를 하지 않는 것이 성능상에 더 이점일 수 있다.
+* DB모델링 및 정규화 작업을 가장 신경써야 한다.
+* 효과
+  * 보다 간단한 연산자에 의해 효과적인 연산이 가능해지도록한다.
+  * 삽입 이상, 삭제 이상, 갱신 이상의 문제가 발생하지 않도록한다.
+  * 새로운 형태의 데이터가 삽입될때 테이블 설계를 재구성할 필요성을 감소시킨다.
+  * 자료의 저장 공간을 최소화한다.
+  * 자료의 불일치를 최소화한다.
+  * 자료 구조를 안정화시킨다.
+
+### *상태이상
+
+* 테이블 내 데이터의 중복과 종속으로 인해 발생되는 오류
+* 여러 가지 사실을 하나의 테이블로 표현하기 떄문에 발생
+* **삭제 이상** : 원하지 않는 자료가 삭제되거나, 원하는 자료가 삭제되지 않는 이상
+* **삽입 이상** : 원하지 않는 자료가 삽입되거나, 원하는 자료가 삽입되지 않는 이상
+* **갱신 이상** : 데이터를 조회할 때 데이터가 모호해지거나 일관성이 없어지는 이상
+
+
+
+### 1정규화
+
+![image](https://user-images.githubusercontent.com/57162257/107476886-17a96a80-6bba-11eb-9868-d060556f3735.png)
+
+### 2정규화
+
+![image](https://user-images.githubusercontent.com/57162257/107476918-2b54d100-6bba-11eb-9e56-ced4c74a8b85.png)
+
+### 3정규화
+
+![image](https://user-images.githubusercontent.com/57162257/107477019-5fc88d00-6bba-11eb-9636-3b474ca7c370.png)
+
+### BCNF
+
+![image](https://user-images.githubusercontent.com/57162257/107477044-6b1bb880-6bba-11eb-9e4b-fc7645ecc046.png)
+
+## [3]MySQL
+
+### DDL(Data Definition Language)
+
+* 데이터 정의어
+* 테이블과 같은 데이터 구조를 정의하는데 사용되는 명령어
+* CREATE, ALTER, DROP, RENAME, TRUNCATE
+  * CREATE : 테이블 생성
+  * ALTER : 테이블 수정
+  * DROP : 테이블 삭제
+
+### DML(Data Manipulation Language)
+
+* 데이터 조작어
+* SELECT, INSERT, UPDATE, DELETE
+  * SELECT : 데이터 조회
+    JOIN : 테이블간의 데이터 중에 조건이 맞는 데이터를 가상테이블을 생성해서 붙여준다. 
+  * INSERT : 데이터 삽입
+  * UPDATE : 데이터 수정
+  * DELETE : 데이터 삭제
+
+## [4]My Batis
+
+* Java Persistence Framework의 하나
+* XML이나 Annotation을 사용해서 Stored Procedure나 SQL문으로 객체들을 연결시킨다.
+* JDBC로 처리하는 상당 부분의 코드와 파라미터 설정 및 결과 매핑을 대신해준다.
+* SQL을 명시해 줘야 하기 때문에 ORM으로 보기 힘들다.
+* 동적 SQL을 처리할수 있다.
+
+## [5]@Mapper
+
+* Spring IoC컨테이너에 서비스 Bean으로 등록
+* 해당 인터페이스에 등록된 SQL Annotation을 토대로 실제 SQL문을 실행시켜 준다.
+* 3 이상 버전부터 mapper.xml 대신 interface클래스의 Annotation을 통해 SQL을 사용할 수 있다.
+* 가급적 SQL키워드는 대문자, 나머지는 소문자로 작성하는것이 가독성에 좋다.
+* 서비스(@Service)와 사용법이 같다.
+
+### @Select
+
+* 조회 Annotation
+* #{value}로 동적 바인딩을 처리하고 @Param("value")로 값을 명시한다.
+
+![image](https://user-images.githubusercontent.com/57162257/107490041-b212a980-6bcc-11eb-858b-f27ce32103b7.png)
+
+### @Insert
+
+* 데이터 삽입 Annotation
+* 반환 값으로 AI값을 받아오고 싶으면 @Options Annotation을 이용해 AI키를 명시해 준다.
+
+![image](https://user-images.githubusercontent.com/57162257/107490582-6a405200-6bcd-11eb-8c99-711a37b3a7b2.png)
+
+### @Update & Delete
+
+* 수정,삭제 Annotation
+
+![image](https://user-images.githubusercontent.com/57162257/107490923-db800500-6bcd-11eb-9dc2-4d8dd2fce054.png)
+
+# SpringBoot Architecture
+
+![image](https://user-images.githubusercontent.com/57162257/107491511-97d9cb00-6bce-11eb-8f4c-03ea06849915.png)
 
 # *서치
 
