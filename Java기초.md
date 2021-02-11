@@ -1058,10 +1058,25 @@ Interface구현체의 장단점.
    spring.datasource.username=DB계정
    spring.datasource.password=DB비밀번호
    
+   spring.jpa.hibernate.ddl-auto=옵션
+   spring.jpa.generate-ddl = boolean
+   spring.jpa.show.sql = boolean
    logging.level.org.sopt.seminar4.mapper=TRACE
    ```
 
-3. .gitignore에는 
+3. spring.jpa.hibernate.ddl-auto에서 create, create-drop, update, validate, none 옵션을 설정할수 있다.
+
+   * **create** : JPA가 DB와 상호작용할 떄 기존에 있던 스키마를 삭제하고 새로 만드는 것을 뜻함
+   * **create-drop** : JPA종료 시점에 기존에 있었던 테이블을 삭제한다.
+   * **update** : JPA에 의해 변경된 부분만 반영한다.
+   * **validate** : 엔티티와 테이블이 정상 매핑되어 있는지만 검증.
+   * **none** : 초기화 동작을 사용하지 않습니다.  
+
+   spring.jpa.generate-dll : spring.jpa.hibernate.dll-auto 옵션을 사용할것인지 결정하는 프로퍼티, 기본적으로 false로 되어있음.
+
+   spring.jpa.show-sql : JPA가 생성한 SQL문을 보여줄 지에 대한 여부를 알려주는 프로퍼티
+
+4. .gitignore에는 
 
    ```java
    application.propertiese
@@ -1203,6 +1218,75 @@ public interface ItemRepository extends JpaRepository<Item,Integer>{}
 2. FileUploadService/S3Service를 통해 파일을 S3에 업로드하고, 파일이 저장된 URL을 DB에 저장한다.
 3. 클라이언트가 파일을 요청 시 파일이 아닌 파일이 저장된 경로를 반환한다.
 4. 따라서 클라이언트로부터 데이터를 받을 때는 MultipartFile데이터 타입으로 받지만, 반환할떈 String타입으로 반환.
+
+1. **[application.propertiese]**
+
+   ```java
+   #AWS S3
+   cloud.aws.credentials.accessKey=엑세스키
+   cloud.aws.credentials.secretKey=비밀엑세스키
+   cloud.aws.stack.auto=false
+   
+   cloud.aws.s3.bucket=버킷이름
+   cloud.aws.region.static=ap-northeast-2
+   
+   #AWS S3 Bucket URL
+   cloud.aws.s3.bucket.url=https://버킷이름.s3.ap-northeast-2.amazonaws.com/
+   ```
+
+2. **[api/controller]**
+
+   ```java
+   @PostMapping("")
+   public ResponseEntity signup(SignUpReq signupReq, @RequestPart(value="profile",required=false)final MultipartFile profile){
+       try{
+           if(profile != null){signupReq.setProfile(profile)};
+           return new ResponseEntity(userService.save(signupReq),HttpStatus.OK);
+       }catch(Excetopn e){
+           log.error(e.getMessage());
+           return new ResponseEntity(FAIL_DEFAULT_RES,HttpStatus.INTERNAL_SERVER_ERROR);
+       }
+   }
+   ```
+
+   * SugnUpReq signupReq 처럼 **아무런 Annotation을 명시하지않고 객체로 받으면 form-data로 받게 된다.**
+   * @RequestPart Annotation을 통해 Multipart중에서 profile 키 값의 파일을 MultipartFile타입의 profile객체로 받는다.(formdata로 사진을 보내면 MultipartFile타입의 profile객체로 받는다.)
+
+   ***전송 타입**(Content-type)
+
+   * Application/json
+
+     ```java
+     @PostMapping("test")
+     public String test(@RequestBody final SignUpReq signUpReq){
+         return signUpReq.toString();
+     }
+     ```
+
+     * @RequestBody는 Content-type이 Appliocation/json인 body만 받는다.
+     * 프론트엔드는 json타입으로 body객체를 보내주어야한다.
+     * 아무 Annotation을 붙이지않는다면 x-www-form-urlencoded전송 타입으로 받는다.
+     * 따라서 사전에 프론트엔드와 정확히 협의하고 가야한다.
+     * 가능한 Application/json을 사용하자.
+
+   * Application/x-www-form-urlencoded
+
+     ```java
+     @PostMapping("test")
+     public String test(final SignUpReq signUpReq){
+         return signUpReq,toString();
+     }
+     ```
+
+     * key&value형식으로 들어옴.
+     * Servlet Container는 Content-type이 x-www-form-urlencoded이면 request의 body를 읽어 Map형태로 변환
+     * body를 인코딩해서 사용해야 하는데, node.js의 request라이브러리는 이 작업을 내부적으로 처리해서 두 전송타입을 구분하지 않아도 된다.
+
+3. 
+
+
+
+
 
 # *서치
 
