@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.sopt.seminar4.dto.User;
 import org.sopt.seminar4.mapper.UserMapper;
 import org.sopt.seminar4.model.DefaultRes;
+import org.sopt.seminar4.model.SignUpReq;
 import org.sopt.seminar4.utils.ResponseMessage;
 import org.sopt.seminar4.utils.StatusCode;
 import org.springframework.stereotype.Service;
@@ -16,9 +17,11 @@ import java.util.List;
 @Service
 public class UserService {
     private final UserMapper userMapper;
+    private final S3FileUploadService s3FileUploadService;
 
-    public UserService(UserMapper userMapper) {
+    public UserService(UserMapper userMapper, S3FileUploadService s3FileUploadService) {
         this.userMapper = userMapper;
+        this.s3FileUploadService = s3FileUploadService;
     }
 
     public DefaultRes getAllUsers(){
@@ -36,9 +39,15 @@ public class UserService {
     }
 
     @Transactional
-    public DefaultRes save(final User user){
+    public DefaultRes save(SignUpReq signUpReq){
         try{
-            userMapper.save(user);
+            //파일이 있다면 파일을 S3에 저장 후 경로를 저장.
+            if(signUpReq.getProfile() != null)
+                log.info("확인getProfile null");
+                signUpReq.setProfileUrl(s3FileUploadService.upload(signUpReq.getProfile()));
+            log.info("확인getProfile notnull");
+            userMapper.save(signUpReq);
+            log.info("확인3");
             return DefaultRes.res(StatusCode.CREATED,ResponseMessage.CREATED_USER);
         }catch(Exception e){
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();

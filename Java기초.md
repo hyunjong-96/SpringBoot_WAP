@@ -1188,7 +1188,21 @@ public interface ItemRepository extends JpaRepository<Item,Integer>{}
   }
   ```
 
-  
+
+
+# 16.S3
+
+**파일업로드 시나리오**
+
+- DB에는 진짜 파일이 아닌 파일이 저장된 S3의 주소/경로/url을 저장한다.
+- File Upload Service & S3 Service를 이용해 파일을 S3에 저장하고, 파일이 저장된 경로를 DB에 저장한다.
+- DB에는 파일이 저장된 경로를 저장하고, 이를 클라이언트에게 반환한다.
+- Node의 S3 module은 반환값으로 자동으로 파일이 저장된 URL을 반환 값으로 줬지만, Spring은 직접URL을 만들어야한다.(버킷 주소+파일 이름 형식.)
+
+1. 클라이언트에게 Multipart-form/data 형식으로 파일을 전송 받는다. 이떄 파일의 데이터타입은 MultipartFile이다.
+2. FileUploadService/S3Service를 통해 파일을 S3에 업로드하고, 파일이 저장된 URL을 DB에 저장한다.
+3. 클라이언트가 파일을 요청 시 파일이 아닌 파일이 저장된 경로를 반환한다.
+4. 따라서 클라이언트로부터 데이터를 받을 때는 MultipartFile데이터 타입으로 받지만, 반환할떈 String타입으로 반환.
 
 # *서치
 

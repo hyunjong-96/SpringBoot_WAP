@@ -4,10 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import static org.sopt.seminar4.model.DefaultRes.FAIL_DEFAULT_RES;
 
 import org.sopt.seminar4.dto.User;
+import org.sopt.seminar4.model.SignUpReq;
 import org.sopt.seminar4.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.ws.Response;
 import java.util.Optional;
@@ -34,9 +36,13 @@ public class userController {
     }
 
     @PostMapping("")
-    public ResponseEntity signup(@RequestBody final User user){
+    public ResponseEntity signup(SignUpReq signUpReq, @RequestPart(value = "profile",required = false)final MultipartFile profile){
         try{
-            return new ResponseEntity(userService.save(user),HttpStatus.OK);
+            //파일을 signUpReq에 저장
+            log.info("확인1");
+            if(profile != null) signUpReq.setProfile(profile);
+            log.info("확인2");
+            return new ResponseEntity(userService.save(signUpReq),HttpStatus.OK);
         }catch(Exception e){
             log.error(e.getMessage());
             return new ResponseEntity(FAIL_DEFAULT_RES,HttpStatus.INTERNAL_SERVER_ERROR);
