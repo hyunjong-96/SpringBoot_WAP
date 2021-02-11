@@ -1045,6 +1045,151 @@ Interface구현체의 장단점.
 
 ![image](https://user-images.githubusercontent.com/57162257/107491511-97d9cb00-6bce-11eb-8f4c-03ea06849915.png)
 
+# MySQL 연동
+
+1. Dependency - Lombok, web, MySQL 설치
+
+2. application.properties에서
+
+   ```java
+   #mysql
+   spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+   spring.datasource.url=jdbc:mysql://DB주소:포트/스키마?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+   spring.datasource.username=DB계정
+   spring.datasource.password=DB비밀번호
+   
+   logging.level.org.sopt.seminar4.mapper=TRACE
+   ```
+
+3. .gitignore에는 
+
+   ```java
+   application.propertiese
+   ```
+
+   를 꼭 설정해주어야한다.
+
+# 15.Spring Data JPA
+
+- 객체와 관계형 데이터베이스를 매핑한다.
+- 객체와 테이블을 Mapping하기 떄문에 SQL을 직접 날리는 것이 아니라 마치 Java에서 라이브러리/메소드 사용하듯이 사용하면 된다.
+- Hibernate등이 있다.
+- 장점
+  1. 객체 지향적인 코드로 인해 더 직관적이고 비즈니스 로직에 집중할 수 있게 도와준다.
+  2. 직접SQL문을 작성할 필요가 없다.
+  3. 재사용 및 유지 보수의 편리성이 증가한다.
+  4. DBMS에 대한 종속성이 줄어든다.
+- 단점
+  1. 모든 쿼리를 ORM으로만 작성하기엔 쿼리가 복잡해지면 사용하기 어렵다.
+  2. 많은 수의 레코드를 찾은 빈도로 벌크 수행을 한다.
+  3. 프로시저가 많은 시스템에선 ORM의 객체 지향적인 장점을 활용하기 어렵다.
+
+## [1]JPA(Java Persistence API)
+
+* Java진영의 ORM표준 기술.
+* 가장 많이 사용하는 것은 Hibernate기반으로 만들어 진 것이다.
+* 개발자가 직접 SQL을 작성하는 것이 아니라 JPA가 제공하는 API를 사용하면 된다.
+* 실행 시점에 자동으로 SQL을 만들어서 실행한다.
+* 객체 모델링과 관계형 데이터베이스 사이의 차이점을 해결해 준다.
+* 실행 시점에 자동으로 SQL을 만들어서 실행한다. SQL을 직접 작성하는 것이 아니라면 어떤 SQL이 실행될 것인지만 생각하면된다.
+* 조회된 결과 역시 자동으로 객체에 매핑해준다.
+* 직접 SQL을 작성하게 할 수도 있다.
+* 데이터베이스에 종속적이지 않아 쉽게 데이터베이스를 교체할수 있다.
+* 테이블 내용이 변경되어도 SQL을 수정할 필요가 없다.
+* Mybatis는 SQL Mapper이다.
+* **Entity Manager, Persistence Context가 기본적인 구성요소이다.**
+* **Entity Manager가 Entity를 저장,조회,수정,삭제하는 일을 관리하고 처리한다.**
+* **이러한 작업을 할 때 Persistence Context을 이용한다.**
+* **Persistence Context는 Entity Manager를 통해서만 접근이 가능하다.**
+
+## [2]Spring Data JPA
+
+* Spring Framework에서 JPA를 편리하게 사용할 수 있도록 지원하는 프로젝트
+* CRUD를 처리하기 위한 공통 인터페이스를 제공한다.
+* Interface만 작성하면 Runtime시에 Spring Data JPA가 구현 객체를 동적으로 생성해 주입해준다.
+* 직접 작성한 Interface는 메소드 이름을 분석해서 JPQL을 실행한다.
+* Mybatis Mapper와 동시에 사용이 가능하다(같은 DB Schema를 사용한다는 전제 하에)
+
+### 연결
+
+[**application.properties**]
+![image](https://user-images.githubusercontent.com/57162257/107504434-a0d29880-6bde-11eb-9f24-d673d969abbb.png)
+
+* JPA strategy전략
+  * SpringPhysicalNamingStrategy : camelCase를 undeer_score형태로 변경
+  * PhysicalNamingStrategyStandardImpl: 변수 이름을 그대로 사용
+
+[**pom.xml**]
+![image](https://user-images.githubusercontent.com/57162257/107504450-a92ad380-6bde-11eb-9e1c-58f9c3bb4ae9.png)
+
+## [3]구조
+
+## **domain** 
+
+테이블과 매핑할 객체를 선언해놓음
+
+### @Entity
+
+* 해당 Class를 DB의 테이블과 매핑한다고 명시, 이렇게 명시한 Class를 **Entity Class**라고한다.
+* Spring Data JPA를 사용한다면 꼭 명시해야 한다.
+
+### @Table
+
+* Entity Class에 매핑할 테이블 정보를 알려준다고 명시
+* name속성을 이용해 테이블 이름을 명시할 수 있다.
+
+### @Id
+
+* 테이블의 기본키와 매핑한다고 알려주는 Annotation
+
+### @Column
+
+* 테이블의 컬럼과 매핑한다고 알려주는 Annotation
+* name속성을 이용해 컬럼 이름을 명시할 수 있다.
+* Annotation을 명시하지 않으면 Class의 필드명으로 컬럼을 매핑한다.
+
+### @Enumerated
+
+* Enum타입을 매핑할 때 사용한다.
+
+### @Temporal
+
+* 날짜 타입을 매핑할 때 사용하는 Annotation이다.
+* TemporalType속성의 값으로 DATE,TIME,TIMESTAMP세가지를 사용할 수 있다.
+
+### @Transient
+
+* 해당 필드를 매핑 하고 싶지 않을 때 명시하는 Annotation
+* 해당 필드를 조회하지 않고, 저장도 하지 않는다.
+
+
+
+## repository
+
+```java
+public interface ItemRepository extends JpaRepository<Item,Integer>{}
+```
+
+* interface만 만들어 놓으면 JPA가 알아서 구현체를 만들어 실행시켜준다.
+
+* DB의 테이블을 Entity의 개념으로 사용한다.
+
+* JpaRepository를 상속받아야하고, Generic의 첫번째 인자로는 Entity, 두번째 인자는 Entity의 id컬럼 타임.
+
+* JpaRepository에는 기본 메소드들(CRUD)이 구현되있음.
+
+* ORM메소드를 사용자선언해줄수 있다.
+  ex)
+
+  ```java
+  public interface ItemRepository extends JpaRepository<Item,Integer>{
+      Optional<Item> findById(int id); //객체 하나
+      Iterable<Item> findByPart(String part); //list
+  }
+  ```
+
+  
+
 # *서치
 
 ## Array &  List
@@ -1098,6 +1243,76 @@ Interface구현체의 장단점.
 * get : index
 * set : index,element
 * remove : index
+
+## Optional
+
+### 정의
+
+T타입의 객체를 포장해 주는 래퍼 클래스(Wrapper Class)이다. 따라서 Optional 인스턴스는 모든 타입의 참조 변수를 저장할 수 있다.
+
+* **of()**
+  null이 아닌 명시된 값을 가지난 Optonal객체를 반환.
+  만약 of()메소드를 통해 생성된 Optional객체에 null이 저장되면 NullPointerExceoption예외 발생.
+  그래서 참조 변수의 값이 만에 하나 null이 될 가능성이 있다면, ofNullable()메소드를 사용하여 Optional객체를 생성하는 것이 좋다.
+* **ofNullable()**
+  명시된 값이 null이 아니면 명시된 값을 가지는 Optional객체를 반환하며, 명시된 값이 null이면 비어있는 Optional객체를 반환.
+
+```java
+Optional<String> opt = Optional.ofNullalbe("자바 Optional 객체");
+System.out.println(opt.get());
+//=> 자바 Optional 객체
+```
+
+### 접근방법
+
+* **get()**
+  get메소드를 통해 Optional객체에 저장된 값에 접근할수 있다.
+  만약 Optional객체에 저장된 값이 null이라면, NoSuchElementExceoption예외 발생.
+  따라서 get()메소드를 호출하기 전에 isPresent()메소드를 사용하여 Optional객체에 저장된 값이 null인지 아닌지 먼저 확인후 호출하는 것이 좋다.
+
+* **isPrsent()**
+  Optional객체에 저장된 값이 있다면 **ture반환**, null을 가지고있다면 **false반환**
+
+  ```java
+  Optional<String> opt = Optional.ofNullable("자바 Optional 객체");
+  if(opt.isPresent()){
+      System.out.println(opt.get());
+  }
+  //=> 자바 Optional 객체
+  
+  ```
+
+* **orElse()**
+  저장된 값이 존재하면 그 값을 반환하고, 값이 존재하지 않으면 인수로 전달된 값을 반환함.
+
+* **orElseGet()**
+  저장된 값이 존재하면 그 값을 반환하고, 값이 존재하지 않으면 인수로 전달된 람다 표현식의 결괏값을 반환함.
+
+* **orElseThrow()**
+  저장된 값이 존재하면 그 값을 반환하고, 값이 존재하지 않으면 인수로 전달된 예외를 발생시킴.
+
+```java
+Optional<String> opt = Optional.empty(); //Optional를 null로 초기화함
+
+System.out.println(opt.orElse("빈 Optional 객체"));
+System.out.println(opt.orElseGet(String::new));
+//=> 빈 Optional 객체
+```
+
+## Iterable
+
+Colliection을 상속하는 최상위 클래스로 **Literable< T >**로 사용
+
+Iterable의 각 배열을 참조하기 위해선 for문이나 forEach문을 사용해야한다는데 forEach문이 최선의 방법이라고 한다.(javascript에선 map)
+
+### convert iterable to list
+
+```java
+Iterable<Item> itemList = itemRepository.findAll();
+List<Item> convertList = new arrayList<>();
+
+itemList.forEach(convertList::add);
+```
 
 
 
