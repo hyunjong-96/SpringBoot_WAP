@@ -1381,6 +1381,8 @@ public interface ItemRepository extends JpaRepository<Item,Integer>{}
 4. 사용자가 디비에존재하면 JwtService-create() //토큰생성
    사용자가 디비에 존재하지않으면 실패DefaultRes
 
+## [2]JWT연결
+
 
 
 # *서치
