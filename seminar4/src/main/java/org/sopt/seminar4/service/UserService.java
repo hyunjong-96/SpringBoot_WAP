@@ -55,4 +55,30 @@ public class UserService {
             return DefaultRes.res(StatusCode.DB_ERROR,ResponseMessage.DB_ERROR);
         }
     }
+
+    @Transactional
+    public DefaultRes update(final int userIdx,final SignUpReq signUpReq){
+        try{
+            if(signUpReq.getProfile() != null)
+                signUpReq.setProfileUrl(s3FileUploadService.upload(signUpReq.getProfile()));
+            userMapper.update(userIdx,signUpReq);
+            return DefaultRes.res(StatusCode.OK,ResponseMessage.UPDATE_USER);
+        }catch(Exception e){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            log.error(e.getMessage());
+            return DefaultRes.res(StatusCode.DB_ERROR,ResponseMessage.DB_ERROR);
+        }
+    }
+
+    @Transactional
+    public DefaultRes deleteByUserIdx(final int userIdx){
+        try{
+            userMapper.delete(userIdx);
+            return DefaultRes.res(StatusCode.OK,ResponseMessage.DELETE_USER);
+        }catch(Exception e){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            log.error(e.getMessage());
+            return DefaultRes.res(StatusCode.DB_ERROR,ResponseMessage.DB_ERROR);
+        }
+    }
 }

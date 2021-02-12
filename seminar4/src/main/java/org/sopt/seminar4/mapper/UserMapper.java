@@ -18,11 +18,11 @@ public interface UserMapper {
 
     //회원 고유 번호로 조회
     @Select("SELECT * FROM user WHERE userIdx = #{userIdx}")
-    User findByuserIdx(@Param("userIdx")final int userIdx);
+    User findByUserIdx(@Param("userIdx")final int userIdx);
 
     //회원 등록, Auto Increment는 회원 고유 번호
     //Auto Increment값을 받아오고 싶으면 리턴 타입을 int(Auto Increment컬럼타입)으로 하면된다.
-    @Insert("INSERT INTO user(name,part,profileUrl) VALUES(#{signUpReq.name},#{signUpReq.part},#{signUpReq.profileUrl})")
+    @Insert("INSERT INTO user(name,part,profileUrl,password) VALUES(#{signUpReq.name},#{signUpReq.part},#{signUpReq.profileUrl},#{signUpReq.password})")
     @Options(useGeneratedKeys = true,keyColumn = "user.userIdx")
     int save(@Param("signUpReq")final SignUpReq signUpReq);
 
@@ -32,9 +32,14 @@ public interface UserMapper {
 
     //회원 정보 수정
     @Update("UPDATE user SET name = #{user.name}, part=#{user.part} WHERE userIdx = #{userIdx}")
-    void update(@Param("userIdx")final int userIdx, @Param("user")final User user);
+    void update(@Param("userIdx")final int userIdx, @Param("user")final SignUpReq signUpReq);
 
     //회원 삭제
     @Delete("DELETE FROM user WHERE userIdx = #{userIdx}")
     void delete(@Param("userIdx")final int userIdx);
+
+    //이름과 비밀번호로 조회
+    @Select("SELECT * FROM user WHERE name = #{name} AND password = #{password}")
+    User findByNameAndPassword(@Param("name")final String name, @Param("password")final String password);
+
 }

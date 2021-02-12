@@ -1282,9 +1282,104 @@ public interface ItemRepository extends JpaRepository<Item,Integer>{}
      * Servlet Container는 Content-type이 x-www-form-urlencoded이면 request의 body를 읽어 Map형태로 변환
      * body를 인코딩해서 사용해야 하는데, node.js의 request라이브러리는 이 작업을 내부적으로 처리해서 두 전송타입을 구분하지 않아도 된다.
 
-3. 
+3. **[service/UserService]**
+
+   ```java
+   @Transactional
+   public DefaultRes save(SignUpReq signUpReq){
+       try{
+           if(signUpReq.getProfile() != null)
+               signUpReq.setProfileUrl(s3FileUploadService.upload(signUpReq.getProfile()));
+           userMapper.save(signUpReq);
+           return DefaultRes.res(StatusCode.CREATED,ResponseMessage.CREATED_USER);
+       }catch(Excetion e){
+           TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+           return DefaultRes.res(StatusCode.DB_ERROR,ResponseMessage.DB_ERROR);
+       }
+   }
+   ```
+
+4. **[mapper/UserMapper]**
+
+   ```java
+   @Insert("INSERT INTO user(name,part,prfileUrl) VALUES(#{signUpReq.name),#{signUpReq.part),#{signUpReq.profileUrl}}})")
+   int save(@Param("signUpReq")final SignUpReq signUpReq)
+   ```
+
+   
+
+# 17.Authorization & Authentication
+
+## **Authorization** 
+
+* 권한부여
+* 해당 자원에 대해서 사용자가 그 자원을 사용할 권한이 있는지 체크하는 권한 체크 과정
+
+## Authentication
+
+* 인증과정
+* 사용자가 서비스를 사용하는 것이 가능하는지를 확인하는 절차.
+
+## Cookie & Session & Token
+
+* **Cookie**
+
+  * 웹브라우저 Local에 저장되는 Key와 Value가 들어있는 작은데이터 파일이다.
+  * 이름,값,만료 날짜, 경로 정보가 들어있다.
+  * 일정 시간동안 데이터 저장 가능.
+  * 클라이언트의 상태 정보를 Local에 저장했다가 참조한다.
+  * 쿠키는 사용자가 따로 요청하지않아도 브라우저가 요청시에 Header에 넣어서 자동으로 서버에 전송
+  * [시나리오]
+    1. 브라우저에서 웹 페이지 접속
+    2. 클아이언트가 요청합 웹 파이지를 받으면서 쿠키를 클라이언트(Local Storage)에 저장
+    3. 클라이언트가 재요청시 요청과 함께 쿠키 값도 전송
+    4. 지속적으로 로그인 정보를 가지고 있는 것처럼 사용한다.
+
+* **Session**
+
+  * 일정 시간동안 같은 브라우저로 들어오는 일련의 요구를 하나의 상태로 보고 그 상태를 유지하는 기술.
+  * 웹 브라우저를 통해 웹 서버에 접속한 이후 브라우저를 종료할 떄 까지 유지되는 상태
+  * 클라이언트가 요청을 보내면 Servlet Container가 클라이언트에게 유일한 세션ID를 부여.
+  * 세션은 서버 메모리에 저장됨. 서버가 리셋되면 세션데이터 역시 사라짐.
+  * 세션을 구분하기 위해 ID가 필요하고 쿠키에 ID만 저장해놓음
+  * [시나리오]
+    * 클라이언트가 서버에 접속 시 세션ID를 발급한다.
+    * 서버에서는 클라이언트로 발급해준 세션 ID를 쿠키를 사용해 저장
+    * 클라이언트는 다시 접속할 때 이 쿠키를 이용해 세션 ID값을 서버에 전달
+    * 서버는 이 세션 ID값으로 클라이언트를 구분.
+
+* **Token**
+
+  * 상태를 유지하지 않음
+  * 사용자의 인증 정보를 서버네 세션,쿠키에 담아두지 않는다.
+  * 인증 정보를 다른 애플리케이션에 전달할 수 있다(OAuth)
+  * 서버 기반 인증의 문제점 - 세션,확정성 CORS의 문제점을 보완할 수 있다.
+
+* **JWT**
+
+  * 토큰 기반 인증 시스템의 구현체
+  * JSON객체 사용
+  * 가볍고 자가수용적
+  * 쉽게 HTTP헤더, URL파라미터 등으로 전달될 수 있다.
+
+  ![image](https://user-images.githubusercontent.com/57162257/107638151-879b1c00-6cb2-11eb-8ecf-17815bb0a2a9.png)
+
+  * 헤더 : 토큰의 타입(JWT), 해싱 알고리즘 명시(HMAC SHA256)
+  * 내용 : 실제 정보(claim)가 들어있다.
+  * 서명 : 토큰의 유효성 검증을 위해 서명 작업을 거친다. 헤더의 인코딩 값과 내용의 인코딩 값을 합친 후 비밀키로 해쉬를 하여 생성한다.
 
 
+
+## [1]로그인 구현
+
+[**pom.xml**]
+![image](https://user-images.githubusercontent.com/57162257/107638862-7c94bb80-6cb3-11eb-9daa-b0d238f8f763.png)
+
+1. LoginController-login()
+2. authService-login()
+3. userMapper-findByNameAndPassword()
+4. 사용자가 디비에존재하면 JwtService-create() //토큰생성
+   사용자가 디비에 존재하지않으면 실패DefaultRes
 
 
 
