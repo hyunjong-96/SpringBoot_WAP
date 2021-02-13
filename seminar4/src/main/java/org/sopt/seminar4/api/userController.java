@@ -28,6 +28,7 @@ public class userController {
     @GetMapping("")
     public ResponseEntity getUser(@RequestParam("name") Optional<String> name){
         try{
+            log.info("getUser");
             if(name.isPresent()) return new ResponseEntity(userService.findByName(name.get()),HttpStatus.OK);
             return new ResponseEntity(userService.getAllUsers(),HttpStatus.OK);
         }catch(Exception e){

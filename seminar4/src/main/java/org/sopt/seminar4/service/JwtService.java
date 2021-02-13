@@ -35,6 +35,7 @@ public class JwtService {
      * @return 토큰
      */
     public String create(final int user_idx) {
+        log.info("시크릿키:"+SECRET);
         try {
             //토큰 생성 빌더 객체 생성
             JWTCreator.Builder b = JWT.create();

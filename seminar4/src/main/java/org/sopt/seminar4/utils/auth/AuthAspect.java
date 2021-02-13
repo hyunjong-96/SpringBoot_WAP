@@ -63,6 +63,8 @@ public class AuthAspect {
             final User user = userMapper.findByUserIdx(token.getUser_idx());
             //유효 사용자 검사
             if (user == null) return RES_RESPONSE_ENTITY;
+            System.out.println("pjp테스트!!!!! "+pjp.proceed(pjp.getArgs()));
+            System.out.println("pjp테스트!!!!!2 "+pjp.getArgs());
             return pjp.proceed(pjp.getArgs());
         }
     }
