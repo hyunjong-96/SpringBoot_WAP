@@ -11,10 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import static com.auth0.jwt.JWT.require;
 
+//JWT토큰을 만들어주는 클래스
 @Slf4j
 @Service
 public class JwtService {
@@ -40,15 +42,22 @@ public class JwtService {
             b.withIssuer(ISSUER);
             //토큰 payload 작성, key - value 형식, 객체도 가능
             b.withClaim("user_idx", user_idx);
-            b.withExpiresAt(EXPIRED_TIME); //토근시간
+            b.withExpiresAt(expiresAt()); //토근시간
             //토큰 해싱해서 반환
             System.out.println("토큰해싱전:"+b);
             System.out.println("토큰해싱후:"+b.sign(Algorithm.HMAC256(SECRET)));
             return b.sign(Algorithm.HMAC256(SECRET));
-        } catch (JWTCreationException JwtCreationException) {
-            log.info(JwtCreationException.getMessage());
+        } catch (JWTCreationException jwtCreationException) {
+            log.info(jwtCreationException.getLocalizedMessage());
         }
         return null;
+    }
+    private Date expiresAt(){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        //한달 24*31;
+        cal.add(Calendar.HOUR,1);
+        return cal.getTime();
     }
 
     /**

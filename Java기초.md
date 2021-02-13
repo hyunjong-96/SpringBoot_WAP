@@ -1383,6 +1383,95 @@ public interface ItemRepository extends JpaRepository<Item,Integer>{}
 
 ## [2]JWT연결
 
+# 18.Architecture(아키텍처)
+
+* 시스템이 어떻게 작동하는지를 설명하는 프레임워크, 구조, 뼈대, 골격이다.
+* 시스템 구성 및 동작 원리를 나타낸다.
+* 소프트웨어 디자인 패턴과 유사하지만 더 큰 범주에 속한다.
+
+## 1.Monolithic Architecture(모놀리식 아키텍쳐)
+
+* 일체형 구조
+* 하나의 애플리케이션(서버)안에 모든 로직이 들어가 있다.
+* 하나의 뭔가를 수정하려면 전체 애플리케이션(서버)를 다시 빌드하고 배포해야한다.
+* 개발이 단순하고 배포 역시 단순하다.
+* 애플리케이션(서버) 구조가 커지고, 팀 규모가 성장하면 여러 단점이 발생한다.
+* 코드, 프레임워크에 강제 당하게 된다(ex. Spring Framework를 상요한다면 나 역시 Spring Framework를 사용해 개발해야한다.)
+
+![image](https://user-images.githubusercontent.com/57162257/107842115-56cafc00-6e04-11eb-9a51-3306c620acef.png)
+
+## 2.Micro Service Architecture(MSA, 마이크로 서비스 아키텍처)
+
+* 각 컴포넌트를 서비스라는 개념으로 정의한다.
+* REST API같은 표준 인터페이스로 그 기능을 외부로 제공한다.
+* 쉽게 생ㄱ가해 각각의 서비스별로 서버를 분리하고 따로 개밣 ㅏ는 것이다.
+* MSA에서는 URI/API설계가 무척 중요하다
+* 애플리케이션 로직을 분리해서 여러 개의 애플리케이션으로 나눠서 배포한다.
+* API Gateway를 사용하면 모든 API에 대해 End Point를 통합함으로써 다른 서비스, 클라이언트 간의 통신하는 것에 도움을 준다.
+* 개발에 있어서 언어/프레임워크에 구속 받지 않게 된다.
+* 설계가 무척 중요하기 때문에 초기 프로젝트 설계 시간이 오래 걸린다.
+* 단시간에 개발하기에는 적합한 아키텍처는 아니다.
+* 추후 서비스 확장에 유리한 구조이다.
+
+![image](https://user-images.githubusercontent.com/57162257/107842240-f8eae400-6e04-11eb-9ed2-257088e9965d.png)
+
+![image](https://user-images.githubusercontent.com/57162257/107842250-18820c80-6e05-11eb-8a98-f7b3c06f4a61.png)
+
+### *API Gateway
+
+* API Gateway는 프론트엔드 혹은 다른 플랙폼이 들어오는 출입구이다. 오직 API Gateway를 통해서만 정보를 얻는다. 그 내부가 어떤 구조, 어떤 통신, 스키마 설계 등은 중요하지 않다.
+* API Gatewway는 각 서비스가 어떤 구성, 어떤 스키마 등을 가졌는지 내용을 알 필요가 없다.
+  오직 기능만 알고 있으면 된다. 다시 말해서 각 서비스에선 API Gateway에게 기능만 알려주면 될 정도로 기능이 명확해야한다.
+* API Gateway입장에선 내부를 생각하는 것 보단 외부에서 볼 떄 어떤 의미로 나뉘는지가 중요하다. 그렇지 않으면 API Gateway를 쓸 필요가 없다.
+
+
+
+# 19.REST API
+
+## 프로젝트단계
+
+1. 프로젝트 기능 확정
+2. 개능별 개발 우선순위 부여 및 역할 분배
+3. URI설계 & DB설계
+4. URI설계를 토대로 API설계
+5. 작업시작...
+6. 기능 테스트
+7. API문서 작성
+8. 클라이언트 연동
+9. 버그 수정
+
+## [1]URI(Uniform Resource Identifier,통합 자원 식별자)
+
+* 자원을 나타내는 유일일한 주소이자 자원을 식별할 수 있는 문자열이다.
+* 하위 개념으로 URL,URN이 있다.
+* 어떤 자원의 위치를 의미하고, Method가 그 위치에 대한 행위를 뜻한다.
+* 네이밍이 직관적이여야한다.
+* 형용사보다는 명사가 이해하기 좋고 복수 형태로 만든다.
+* URI설계에 정답은 없지만 항상 일관된 규칙으로 작성해야 혼동하지 않는다.
+
+## [2]URL(Uniform Resource Locator,통합 자원 지시자)
+
+* 네트워크 상에서 해당 자원이 어디 있는지를 알려주기 위한 규약.
+* 특정 서버의 한 자원에 대한 구체적인 위치를 나타낸다.
+* 127.0.0.1:8080/users?name=이현종 은 URI
+* 127.0.0.1:8080/users/이현종/profile.jpg는 URL이면서 URI
+
+## [3]API(Application Programming interface)
+
+* 서버 애플리케이션의 기능을 사용하기 위한 수단/방법
+* 프론트 엔드는 다양한 API를 사용해 서버의 기능을 사용한다.
+
+## [4]REST API(REpresentational State Transfer API)
+
+* Resource-URI, Method, Message 3가지 요소로 구성된다.
+* 모든 것을,자원,명사로 표현
+* Self-Descriptiveness(자체 표현 구조) : REST API메시지만 보고도 이를 쉽게 이해 할 수 있는 자체 표현 구조로 되어있다.
+* Stateless(무상태성) : 상태 정보를 저장하지 않고 각 API서버는 들어오는 요청만을 들어오는 메시지로 처리하면 된다.
+
+
+
+
+
 
 
 # *서치
