@@ -1393,6 +1393,8 @@ public interface ItemRepository extends JpaRepository<Item,Integer>{}
 
 ## [3]Spring AOP(Aspect Oriented Programming,관점 지향 프로그래밍)
 
+**AOP는 관점지향 프로그래밍으로 기능을 핵심 비즈니스 기능과 공통 기능으로 구분하고, 공통 기능을 개발자의 코드 밖에서 필요한 시점에 적용하는 프로그래밍 방법** 
+
 * 애플리케이션 전체에 걸쳐 사용되는 기능들을 재사용하도록 지원하는 것이다.
 * 가로(횡단)영역의 공통된 부분을 잘라냈다고 해서 크로스 컷팅(Cross-Cutting)이라고도 불린다.
 * 로깅,트랜잭션,보안 등 사용
@@ -1435,6 +1437,7 @@ public interface ItemRepository extends JpaRepository<Item,Integer>{}
    ```java
    //항상 @annotation 패키지 이름을 실제 사용할 annotation 경로로 맞춰줘야 한다.
    //Auth어노테이션에 사용된 곳에서 토큰 유효성검사 실시.
+   //@Around 어노테이션을 사용했으므로 유효성검사가 끝내고 pjp.proceed()가 반환되고 @Around는 종료된다.
        @Around("@annotation(org.sopt.seminar4.utils.auth.Auth)")
        public Object around(final ProceedingJoinPoint pjp) throws Throwable {
            final String jwt = httpServletRequest.getHeader(AUTHORIZATION);
@@ -1456,10 +1459,102 @@ public interface ItemRepository extends JpaRepository<Item,Integer>{}
    ```
 
    * @Aspect어노테이션에 선언된 클래스의 메소드에 아래 어노테이션을 선언해주면, 특정 함수 실행 전후의 특정처리가 가능해진다.
+
      * @Pointcut : aspectJ를 적용할 타겟을 정의해준다. 전체 컨트롤러의 함수대상, 특정 어노테이션을 설정한 함수대상, 특정 메소드 대상 등 개발자가 적용하길 원하는 범위를 정의하는 어노테이션
      * @Before : aspectJ를 적용할 타겟 메소드가 실행되기 '전'수행됨
      * @AfterReturning: aspectJ를 적용할 타겟 메소드가 실행된 '후'수행됨(제일 마지막에 수행)
      * @Around : aspectJ를 적용할 타겟 메소드 실행 전, 후 처리를 모두 할 수 있음
+
+     ```java
+     import org.aspectj.lang.JoinPoint;
+     import org.aspectj.lang.ProceedingJoinPoint;
+     import org.aspectj.lang.annotation.*;
+     import org.slf4j.Logger;
+     import org.slf4j.LoggerFactory;
+     import org.springframework.stereotype.Component;
+     
+     @Aspect
+     @Component
+     public class LogAopHelperCLS {
+     
+         private static final Logger LOGGER = LoggerFactory.getLogger(LogAopHelperCLS.class);
+     
+         /**
+          *   @GetMapping 설정된 메소드 또는 클래스 설정
+          *   GetMapping 노테이션이 설정된 특정 클래스/메소드에만 AspectJ가 적용됨.
+          */
+         @Pointcut("@annotation(org.springframework.web.bind.annotation.GetMapping)")
+         public void GetMapping(){ } 
+         //위의 Auth어노테이션을 사용하지않고 @Pointcut 어노테이션을 사용해서 GepMapping메소드(특정 함수)를 선언해줄수있다.
+     
+         /**
+          * @param joinPoint
+          */
+         @Before("GetMapping()")
+         public void before(JoinPoint joinPoint) {
+             LOGGER.info("=====================AspectJ TEST  : Before Logging Start=====================");
+             LOGGER.info("=====================AspectJ TEST  : Before Logging End=====================");
+         }
+     
+         /**
+          * @param joinPoint
+          * @param result
+          */
+         @AfterReturning(pointcut = "GetMapping()", returning = "result")
+         public void AfterReturning(JoinPoint joinPoint, Object result) {
+             LOGGER.info("=====================AspectJ TEST  : AfterReturning Logging Start=====================");
+             LOGGER.info("=====================AspectJ TEST  : AfterReturning Logging END=====================");
+         }
+     
+         /**
+          *
+          * @param joinPoint
+          * @return
+          * @throws Throwable
+          */
+         @Around("GetMapping()")
+         public Object Around(ProceedingJoinPoint joinPoint) throws Throwable {
+             LOGGER.info("=====================AspectJ TEST  : Around Logging Start=====================");
+             try {
+                 Object result = joinPoint.proceed();
+                 LOGGER.info("=====================AspectJ TEST  : Around Logging END=====================");
+                 return result;
+             }catch (Exception e) {
+                 LOGGER.error("=====================AspectJ Around Exception=====================");
+                 LOGGER.error(e.toString());
+                 return null;
+             }
+         }
+     
+     }
+     ```
+
+     **[Controller]**
+
+     ![image](https://user-images.githubusercontent.com/57162257/107846044-dcaa6f80-6e23-11eb-88a4-f9e88a3fd101.png)
+
+     
+
+     **[log]**
+
+     ![image](https://user-images.githubusercontent.com/57162257/107846064-17aca300-6e24-11eb-81a4-46a514cec0ba.png)
+
+     @Around시작 -> @Before 시작,종료 -> @Around종료 -> @AfterReturning 시작,종료
+
+     (pjp == joinPoint)
+
+     **@Around의 시작과 종료는 joinPoint.proceed()전후로 나뉜다.**
+
+     **joinPoint.proceed()는 실제 타겟 함수 실행 결과를 처리하고 있다.**
+
+     ```
+     proceed()에서 정상적으로 메서드를 실행한 후 리턴 값을 주는데 가로채서 어떤 action을 한 후에 기존 리턴 값을 되돌려 주지 않으면 가로챈 AOP가 결과값을 변경한 것, 지워버린 것과 다름없다.
+     즉, pjp.proceed()는 기존 메서드를 실행시켜주는거고 aspect는 실행시킨 기존 메소드의 반환값을 그대로 반환해주어야한다.
+     
+     출처: https://jeong-pro.tistory.com/171 [기본기를 쌓는 정아마추어 코딩블로그]
+     ```
+
+     
 
 # 18.Architecture(아키텍처)
 
