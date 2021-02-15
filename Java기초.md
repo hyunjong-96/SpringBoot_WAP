@@ -1383,6 +1383,27 @@ public interface ItemRepository extends JpaRepository<Item,Integer>{}
 
 ## [2]JWT연결
 
+[pom.xml]
+
+```
+<dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>3.12.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>1.9.6</version>
+        </dependency>
+```
+
+1. [loginController] : 로그인 정보를 body를 통해 받는다.
+2. [authService] : 등록된 정보인지 확인
+3. [JwtService] : 등록된 정보라면 JwtService의 **create메소드**를 통해 토큰값 반환(토큰생성빌더 -> 토큰옵션(토큰 생성자, payload작성, 토큰시간 등)작성 -> 토큰 해싱)
+4. [JwtService] : 반환된 토큰을 TokenRes라는 클래스의 객체에 담아서 반환해준다.
+5. 클라이언트에서 res된 token값을 확인한다.
+
 ***Postman**
 
 * Header에 Authorization에 jwt토큰값을 넣어준다.
