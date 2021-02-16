@@ -2229,3 +2229,268 @@ public class Member{
 ```
 
 위의 코드처럼 이미 매핑되어있던 team의 members리스트에서 해당 member객체를 제거해주면 team1에서 더이상 해당 memeber를 조회하지 않을것이다.
+
+
+
+## [3]다양한 연관관계 매핑
+
+### (1)일대다 단방향
+
+* 대다 단방향은 일대다(1:N)에서 일(1)이 연관관계의 주인이다.
+* 일대다 단방향 관계를 매핑할 때는 @JoinColumn을 꼭 사용해야한다.
+* **일대다 단방향 매핑보다는 다대일 양방향 매핑을 선호함.**
+
+### (2)일대다 양방향
+
+* **다대일 양방향을 사용하자**
+
+### (3)일대일
+
+* 양쪽이 서로 하나의 관계만 가진다.(회원과 사물함의 관계)
+
+* 일대일관계는 주 테이블이나 대상 테이블 둘 중 어느곳이나 외래키를 가질수 있다.
+
+* 외래 키에 데이터베이스 유니크(UNI)제약 조건이 추가되야 한다.
+
+* 주 테이블에 외래 키
+
+  * 주 객체가 대상 객체를 참조하는 것처럼 주 테이블에 외래 키를 두고 대상 테이블을 참조
+  * 외래 키를 참조와 비슷하게 할 수 있어서 객체지향 개발자들이 선호
+  * 장점 : 주 테이블이 외래 키를 가지고 있으므로 주 테이블만 확인해도 대상테이블과 연관관계가 있는지 알 수 있다.
+
+* **단방향**
+  ![image](https://user-images.githubusercontent.com/57162257/108055680-a4a96380-7093-11eb-9220-7093227fd1e2.png)
+  MEMBER가 주 테이블이고 LOCKER는 대상 테이블
+  회원은 하나의 Locker만 가지고, Locker는 하나의 회원에 의해서만 사용되는 경우.
+  @OneToOne어노테이션을 사용하고, 이 관계는 다대일 단방향(@ManyToOne)과 거의 비슷하다.
+
+* **양방향**
+  ![image](https://user-images.githubusercontent.com/57162257/108055758-c0ad0500-7093-11eb-96f7-7399f540006a.png)
+  양방향이므로 연관관계에서 주인을 정해주어야하는데, MEMBER테이블이 외래 키를 가지고 있으므로 MEMBER엔티티의 ember.locker가 연관관계의 주인이다.
+  따라서 반대 매핑인 Locker.member는 mappedBy를 선언해서 연관관계의 주인이 아니라는것을 설정해주어야한다.
+
+  
+
+* 대상 테이블 외래 키
+
+  * 전통적인 데이터베이스 개발자들은 보통 대상 테이블에 외래 키를 두는 것을 선호
+  * 장점 : 테이블 관계를 일대일에서 일대다로 변경할 때 테이블 구조를 그대로 유지할 수 있다.
+  * **단방향**
+    ![image](https://user-images.githubusercontent.com/57162257/108056302-6f514580-7094-11eb-970d-aa18aeef0319.png)
+    위 처럼 일대일 관계 중 대상 테이블에 외래 키가 있는 단방향 관계는 JPA에서 지원하지 않음으로 위 모양으로 매핑할 수 있는 방법은 없다.
+    그러므로 단방향 관계를 Locker에서 Member방향으로 수정하거나, 양방향 관계로 만들고 Locker를 연관관계의 주인으로 설정해야한다.
+  * **양방향**
+    ![image](https://user-images.githubusercontent.com/57162257/108056330-7415f980-7094-11eb-9f67-61c8b0929022.png)
+    대상 테이블에 외래키를 두고 싶으면 주 엔티티인 Member엔티티대신에 대상 엔티티안 Locker엔티티를 주인으로 설정하여 Locker테이블의 외래키를 관리하게 한다.
+
+  
+
+  
+
+  ### (4)다대다
+
+  * 실무에서는 안쓴다고 한다.
+
+  
+
+  
+
+  ## [4]임베디드 타입(복합 값 타입)
+
+  새로운 값 타입을 직접 정의해서 사용할 수 있는데, JPA에서는 이것을 임베디드 타입(embedded type)이라 한다.
+  중요한 것은 직접 정의한 임베디드 타입도 int,String 처럼 값 타입이라는 것이다.
+
+  * 임베디드 타입을 사용하지 않았을때
+
+    ```java
+    @Entity
+    public class Member{
+        @Id
+        @GeneratedValue
+        private Long id;
+        private String name;
+        
+        //근무기간
+        @Temporal(TemporalType.DATE)
+        Date startDate;
+        @Temporal(TemporalType.DATE)
+        Date endDate;
+        
+        //집 주소 표현
+        private String city;
+        private String street;
+        private String zipcode;
+    }
+    ```
+
+    
+
+  이 엔티티를 설명하려면 ```"회원 엔티티는 이름, 근무 시작일, 근무 종료일, 주소 도시,주소 번지, 주소 우편 번호를 가진다."``` 로 설명할수 있다.
+
+  하지만 정보를 장황하게 설명하기 보다는 주요 카테고리로 설명을 하는것이 조금더 효율적일것이다
+
+  ```회원 엔티티는 이름, 근무기간, 집 주소를 가진다.``` 라는 식으로.. 
+
+  엔티티가 상세한 데이터를 그대로 가지고 있다는 것은 객체지향적이지 않으면 응집력만 떨어트리는것이다.
+
+  대신 근무기간, 주소 같은 타입이 있다면 코드는 더 명확해질 것이다.
+
+  * 임베디드 타입을 사용
+
+    ```java
+    @Entity
+    public class Member{
+        @Id
+        @GeneratedValue
+        private Long id;
+        private String name;
+        
+        @Embedded
+        private Period workPeriod; //근무기간
+        
+        @Embedded
+        private Address homeAddress; //집주소
+    }
+    ```
+
+    ```java
+    //근무기간 임베디드 타입
+    @Embeddable
+    public class Period{
+        @Temporal(TemporalType.DATE)
+        Date startDate;
+        @Temporal(TemporalType.DATE)
+        Date endDate;
+    }
+    ```
+
+    ```java
+    //집주소 임베디드 타입
+    @Embeddable
+    public class Address{
+        @Column(name="city")
+        private String city;
+        private String street;
+        private String zipcode;
+    }
+    ```
+
+  
+
+  ### (1)임베디드 타입 사용하는 방법
+
+  * @Embeddable : 값 타입을 정의하는 곳에 표시
+  * @Embedded : 값 타입을 사용하는 곳에 표시
+  * 임베디드 타입은 기본 생성자 필수!
+  * 임베디드를 사용한 구조
+    ![image](https://user-images.githubusercontent.com/57162257/108058539-89405780-7097-11eb-8106-a868e3fedc1a.png)
+  * 장점
+    * 재사용
+    * 높은 응집도
+
+  
+
+  #### **임베디드 타입과 테이블 매핑**
+
+  ![image](https://user-images.githubusercontent.com/57162257/108058946-1a173300-7098-11eb-8170-d343792b9fe0.png)
+
+  * 임베디드 타입은 엔티티의 값일 뿐
+  * 값이 속한 엔티티의 테이블에 매핑한다.
+  * 베디드 타입 덕분에 객체와 테이블을 아주 세밀하게(fine-grained)매핑하는 것이 가능.
+  * 잘 설계한 ORM애플리케이션은 매핑한 테이블의 수보다 클래스의 수가 더 많다.
+
+  
+
+  #### 임베디드 타입과 연관관계
+
+  ```java
+  @Entity
+  public class Member{
+      
+      @Embedded
+      Address address; //임베디드 타입 포함
+      PhoneNumber phoneNumber; //임베디드 타입 포함
+  }
+  
+  @Embeddable
+  public class Address{
+      String street;
+      String city;
+      String state;
+      @Embedded
+      ZipCode zipcode; //임베디드 타입 포함
+  }
+  
+  @Embeddable
+  public class Zipcode{
+      String zip;
+      String plusFour;
+  }
+  
+  @Embeddable
+  public class PhoneNumber{
+      String areaCode;
+      String localNumber;
+      
+      @ManyToOne
+      PhoneServiceProvider provider; //엔티티 참조
+  }
+  
+  @Entity
+  public class PhoneServiceProvider{
+      @Id
+      @GeneratedValue
+      String name;
+  }
+  ```
+
+  
+
+  #### @AttributeOverride : 속성 재정의
+
+  임베디드 타입에 정의한 매핑정보를 재정의하려면 엔티티에 @AttributeOverride를 사용하면 된다.
+
+  예를 들어 회원에게 주소가 하나 더 필요하다면
+
+  ```java
+  @Entity
+  public class Member{
+      @Id
+      @GeneratedValue
+      private Long id;
+      private String name;
+      
+      @Embedded
+      Address homeAddress;
+      
+      @Embedded
+      Address companyAddress;
+  }
+  ```
+
+  이렇게 추가해줄수 있지만 이때 테이블에 매핑하는 컬럼명(Address)이 중복되는 것이다. 이떄 @AttributeOverrides를 사용해서 매핑정보를 재정의해야한다.
+
+  ```java
+  @Entity
+  public class Member{
+      ...
+          
+     	@Embedded
+      Address homeAddress;
+      
+      @Embedded
+      @AttributeOverrides({
+          @AttributeOverride(name="city", column=@Column(name="COMPANY_CITY")),
+          @AttributeOverride(name="street", column=@Column(name="COMPANY_STREET")),
+          @AttributeOverride(name="zipcode",column=@Column(name="COMPANY_ZIPCODE"))
+      })
+      Address companyAddress;
+  }
+  ```
+
+  위의 코드처럼 재정의해준다면 재정의한 이름으로 테이블이 생성된다.
+
+  * ```@AttributeOverrides는 엔티티에 설정해야한다. 임베디드 타입이 임베디드 타입을 가지고 있어도 엔티티에 설정해야한다.```
+  * ```임베디드 타입이 null이면 매핑한 컬럼 값은 모두 null이 된다.```
+
+  
