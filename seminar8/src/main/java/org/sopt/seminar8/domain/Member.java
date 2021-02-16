@@ -9,14 +9,15 @@ import javax.persistence.*;
 @Getter
 @Entity
 public class Member {
+    public Member(){ }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "USERNAME")
+    @Column(name = "user_name")
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "TEAM_ID")
+    @JoinColumn(name = "team_id")
     private Team team;
 }

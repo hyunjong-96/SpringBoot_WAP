@@ -11,6 +11,7 @@ import java.util.List;
 @Getter
 @Entity
 public class Team {
+    public Team(){ }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,5 +20,5 @@ public class Team {
 
     //양방향 매핑(with Member)
     @OneToMany(mappedBy = "team")
-    private List<Member> members = new ArrayList<Member>();
+    private List<Member> members = new ArrayList<>();
 }

@@ -25,7 +25,8 @@ public class TestController {
     @GetMapping("/jpa")
     public ResponseEntity jpaTest(){
         try{
-            Item item = new Item(2,"test");
+            Long id = new Long(2);
+            Item item = new Item(id,"test");
             log.info("----------------jpa test start----------------");
             log.info(item.toString());
             log.info("----------------jpa insert data----------------");
