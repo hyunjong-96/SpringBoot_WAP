@@ -1,15 +1,15 @@
 package org.sopt.seminar8.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Setter
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Entity
 public class Member {
-    public Member(){ }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
